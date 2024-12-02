@@ -280,10 +280,7 @@ server.setRequestHandler(GetPromptRequestSchema, async (request) => {
         messages: [
           {
             role: "user",
-            content: {
-              type: "text",
-              text: formatResponse(response.toString())
-            }
+            content: formatResponse(response.toString())
           }
         ],
       };
