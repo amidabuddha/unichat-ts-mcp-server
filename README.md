@@ -1,6 +1,7 @@
-# unichat-ts-mcp-server MCP Server
-
-Unichat MCP Server in TypeScript. Also available in [Python](https://github.com/amidabuddha/unichat-mcp-server)
+# Unichat MCP Server in TypeScript
+Also available in [Python](https://github.com/amidabuddha/unichat-mcp-server)
+--
+Send requests to OpenAI, MistralAI, Anthropic, xAI, or Google AI using MCP protocol via tool or predefined prompts. Vendor API key required
 
 ### Tools
 
