@@ -1,14 +1,4 @@
-#!/usr/bin/env node
-
-/**
- * This is a template MCP server that implements a simple notes system.
- * It demonstrates core MCP concepts like resources and tools by allowing:
- * - Listing notes as resources
- * - Reading individual notes
- * - Creating new notes via a tool
- * - Summarizing all notes via a prompt
- */
-
+import { UnifiedChatApi, Message, MODELS_LIST } from "unichat-ts";
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import {
@@ -18,26 +8,115 @@ import {
   ReadResourceRequestSchema,
   ListPromptsRequestSchema,
   GetPromptRequestSchema,
+  PromptArgument,
 } from "@modelcontextprotocol/sdk/types.js";
 
-/**
- * Type alias for a note object.
- */
-type Note = { title: string, content: string };
 
-/**
- * Simple in-memory storage for notes.
- * In a real implementation, this would likely be backed by a database.
- */
-const notes: { [id: string]: Note } = {
-  "1": { title: "First Note", content: "This is note 1" },
-  "2": { title: "Second Note", content: "This is note 2" }
+// Environment validation
+const MODEL = process.env.UNICHAT_MODEL;
+if (!MODEL) {
+  throw new Error("UNICHAT_MODEL environment variable required");
+}
+if (!Object.values(MODELS_LIST).flat().includes(MODEL)) {
+  throw new Error(`Unsupported model: ${MODEL}`);
+}
+
+const API_KEY = process.env.UNICHAT_API_KEY;
+if (!API_KEY) {
+  throw new Error("UNICHAT_API_KEY environment variable required");
+}
+
+
+// Validation functions
+function validateMessages(messages: Message[]): void {
+  if (messages.length !== 2) {
+    throw new Error("Exactly two messages are required: one system message and one user message");
+  }
+
+  if (messages[0].role !== "system") {
+    throw new Error("First message must have role 'system'");
+  }
+
+  if (messages[1].role !== "user") {
+    throw new Error("Second message must have role 'user'");
+  }
+}
+
+// Format response helper
+function formatResponse(response: string) {
+  try {
+    return { type: "text", text: response.trim() };
+  } catch (e) {
+    return { type: "text", text: `Error formatting response: ${String(e)}` };
+  }
+}
+
+// Define prompts
+const PROMPTS = {
+  code_review:  {
+    name: "code_review",
+    description: "Review code for best practices, potential issues, and improvements",
+    arguments: [{
+      name: "code",
+      description: "The code to review",
+      required: true
+    }]
+  },
+  document_code: {
+    name: "document_code",
+    description: "Generate documentation for code including docstrings and comments",
+    arguments: [{
+      name: "code",
+      description: "The code to document",
+      required: true
+    }]
+  },
+  explain_code: {
+    name: "explain_code",
+    description: "Explain how a piece of code works in detail",
+    arguments: [{
+      name: "code",
+      description: "The code to explain",
+      required: true
+    }]
+  }
 };
 
-/**
- * Create an MCP server with capabilities for resources (to list/read notes),
- * tools (to create new notes), and prompts (to summarize notes).
- */
+const PROMPT_TEMPLATES = {
+  code_review: `You are a senior software engineer conducting a thorough code review.
+    Review the following code for:
+    - Best practices
+    - Potential bugs
+    - Performance issues
+    - Security concerns
+    - Code style and readability
+
+    Code to review:
+    {code}`,
+  document_code: `You are a technical documentation expert.
+    Generate comprehensive documentation for the following code.
+    Include:
+    - Overview
+    - Function/class documentation
+    - Parameter descriptions
+    - Return value descriptions
+    - Usage examples
+
+    Code to document:
+    {code}`,
+  explain_code: `You are a programming instructor explaining code to a beginner level programmer.
+    Explain how the following code works:
+
+    {code}
+
+    Break down:
+    - Overall purpose
+    - Key components
+    - How it works step by step
+    - Any important concepts used`
+};
+
+// Create server instance
 const server = new Server(
   {
     name: "unichat-ts-mcp-server",
@@ -52,165 +131,126 @@ const server = new Server(
   }
 );
 
-/**
- * Handler for listing available notes as resources.
- * Each note is exposed as a resource with:
- * - A note:// URI scheme
- * - Plain text MIME type
- * - Human readable name and description (now including the note title)
- */
-server.setRequestHandler(ListResourcesRequestSchema, async () => {
-  return {
-    resources: Object.entries(notes).map(([id, note]) => ({
-      uri: `note:///${id}`,
-      mimeType: "text/plain",
-      name: note.title,
-      description: `A text note: ${note.title}`
-    }))
-  };
-});
-
-/**
- * Handler for reading the contents of a specific note.
- * Takes a note:// URI and returns the note content as plain text.
- */
-server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
-  const url = new URL(request.params.uri);
-  const id = url.pathname.replace(/^\//, '');
-  const note = notes[id];
-
-  if (!note) {
-    throw new Error(`Note ${id} not found`);
-  }
-
-  return {
-    contents: [{
-      uri: request.params.uri,
-      mimeType: "text/plain",
-      text: note.content
-    }]
-  };
-});
-
-/**
- * Handler that lists available tools.
- * Exposes a single "create_note" tool that lets clients create new notes.
- */
+// Tool handlers
 server.setRequestHandler(ListToolsRequestSchema, async () => {
   return {
     tools: [
       {
-        name: "create_note",
-        description: "Create a new note",
+        name: "unichat",
+        description: `Chat with the assistant. Messages must follow a specific structure:
+            - First message should be a system message defining the task or context
+            - Second message should be a user message containing the specific query or request
+
+            Example structure:
+            {
+                "messages": [
+                    {"role": "system", "content": "You are a helpful assistant focused on answering questions about Python programming"},
+                    {"role": "user", "content": "How do I use list comprehensions?"}
+                ]
+            }`,
         inputSchema: {
           type: "object",
           properties: {
-            title: {
-              type: "string",
-              description: "Title of the note"
+            messages: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  role: {
+                    type: "string",
+                    description: "The role of the message sender. Must be either 'system' or 'user'",
+                    enum: ["system", "user"]
+                  },
+                  content: {
+                    type: "string",
+                    description: "The content of the message. For system messages, this should define the context or task. For user messages, this should contain the specific query."
+                  },
+                },
+                required: ["role", "content"],
+              },
+              minItems: 2,
+              maxItems: 2,
+              description: "Array of exactly two messages: first a system message defining the task, then a user message with the specific query"
             },
-            content: {
-              type: "string",
-              description: "Text content of the note"
-            }
           },
-          required: ["title", "content"]
+          required: ["messages"]
         }
       }
     ]
   };
 });
 
-/**
- * Handler for the create_note tool.
- * Creates a new note with the provided title and content, and returns success message.
- */
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
   switch (request.params.name) {
-    case "create_note": {
-      const title = String(request.params.arguments?.title);
-      const content = String(request.params.arguments?.content);
-      if (!title || !content) {
-        throw new Error("Title and content are required");
+    case "unichat": {
+      try {
+        const messages = request.params.arguments?.messages as Message[];
+        validateMessages(messages);
+
+        const client = new UnifiedChatApi(API_KEY);
+
+        const response = await client.chat.completions.create({
+          model: MODEL,
+          messages: messages,
+          stream: false
+        });
+
+        return {
+          content: [formatResponse(response.toString())]
+        };
+      } catch (e) {
+        throw new Error(`An error occurred: ${String(e)}`);
       }
-
-      const id = String(Object.keys(notes).length + 1);
-      notes[id] = { title, content };
-
-      return {
-        content: [{
-          type: "text",
-          text: `Created note ${id}: ${title}`
-        }]
-      };
     }
 
     default:
-      throw new Error("Unknown tool");
+      throw new Error(`Unknown tool: ${request.params.name}`);
   }
 });
 
-/**
- * Handler that lists available prompts.
- * Exposes a single "summarize_notes" prompt that summarizes all notes.
- */
+// Prompt handlers
 server.setRequestHandler(ListPromptsRequestSchema, async () => {
   return {
     prompts: [
-      {
-        name: "summarize_notes",
-        description: "Summarize all notes",
-      }
+      ...Object.values(PROMPTS)
     ]
   };
 });
 
-/**
- * Handler for the summarize_notes prompt.
- * Returns a prompt that requests summarization of all notes, with the notes' contents embedded as resources.
- */
 server.setRequestHandler(GetPromptRequestSchema, async (request) => {
-  if (request.params.name !== "summarize_notes") {
-    throw new Error("Unknown prompt");
+  if (request.params.name in PROMPTS) {
+    const promptName = request.params.name.toString();
+    const code = request.params.arguments?.code;
+
+    if (!code) {
+      throw new Error("Missing required argument: code");
+    }
+
+    const systemContent = PROMPT_TEMPLATES[promptName].replace("{code}", code);
+
+    try {
+      // Here you would integrate with your actual chat API
+      // For now, we'll mock a response
+      const response = "This is a mock response from the chat API";
+
+      return {
+        description: `Requested code manipulation`,
+        messages: [
+          {
+            role: "user",
+            content: formatResponse(response)
+          }
+        ]
+      };
+    } catch (e) {
+      throw new Error(`An error occurred: ${String(e)}`);
+    }
   }
 
-  const embeddedNotes = Object.entries(notes).map(([id, note]) => ({
-    type: "resource" as const,
-    resource: {
-      uri: `note:///${id}`,
-      mimeType: "text/plain",
-      text: note.content
-    }
-  }));
-
-  return {
-    messages: [
-      {
-        role: "user",
-        content: {
-          type: "text",
-          text: "Please summarize the following notes:"
-        }
-      },
-      ...embeddedNotes.map(note => ({
-        role: "user" as const,
-        content: note
-      })),
-      {
-        role: "user",
-        content: {
-          type: "text",
-          text: "Provide a concise summary of all the notes above."
-        }
-      }
-    ]
-  };
+  throw new Error("Unknown prompt");
 });
 
-/**
- * Start the server using stdio transport.
- * This allows the server to communicate via standard input/output streams.
- */
+// Start the server
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
