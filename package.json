@@ -1,8 +1,9 @@
 {
   "name": "unichat-ts-mcp-server",
-  "version": "0.1.0",
+  "version": "0.1.1",
+  "author": "Stefan",
+  "license": "MIT",
   "description": "Unichat MCP Server",
-  "private": true,
   "type": "module",
   "bin": {
     "unichat-ts-mcp-server": "./build/index.js"
@@ -23,5 +24,10 @@
   "devDependencies": {
     "@types/node": "^20.11.24",
     "typescript": "^5.3.3"
+  },
+  "homepage": "https://github.com/amidabuddha/unichat-ts-mcp-server#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/amidabuddha/unichat-ts-mcp-server.git"
   }
 }

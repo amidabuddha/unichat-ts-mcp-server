@@ -2,28 +2,32 @@
 
 Unichat MCP Server
 
-This is a TypeScript-based MCP server that implements a simple notes system. It demonstrates core MCP concepts by providing:
-
-- Resources representing text notes with URIs and metadata
-- Tools for creating new notes
-- Prompts for generating summaries of notes
-
-## Features
-
-### Resources
-- List and access notes via `note://` URIs
-- Each note has a title, content and metadata
-- Plain text mime type for simple content access
-
 ### Tools
-- `create_note` - Create new text notes
-  - Takes title and content as required parameters
-  - Stores note in server state
+
+The server implements one tool:
+- `unichat`: Send a request to unichat
+  - Takes "messages" as required string arguments
+  - Returns a response
 
 ### Prompts
-- `summarize_notes` - Generate a summary of all stored notes
-  - Includes all note contents as embedded resources
-  - Returns structured prompt for LLM summarization
+
+- `code_review`
+  - Review code for best practices, potential issues, and improvements
+  - Arguments:
+    - `code` (string, required): The code to review"
+- `document_code`
+  - Generate documentation for code including docstrings and comments
+  - Arguments:
+    - `code` (string, required): The code to comment"
+- `explain_code`
+  - Explain how a piece of code works in detail
+  - Arguments:
+    - `code` (string, required): The code to explain"
+- `code_rework`
+  - Apply requested changes to the provided code
+  - Arguments:
+    - `changes` (string, optional): The changes to apply"
+    - `code` (string, required): The code to rework"
 
 ## Development
 
@@ -49,13 +53,37 @@ To use with Claude Desktop, add the server config:
 On MacOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
 On Windows: `%APPDATA%/Claude/claude_desktop_config.json`
 
+Run locally:
 ```json
 {
   "mcpServers": {
     "unichat-ts-mcp-server": {
-      "command": "/path/to/unichat-ts-mcp-server/build/index.js"
+      "command": "node",
+      "args": [
+        "{{/path/to}}/unichat-ts-mcp-server/build/index.js"
+      ],
+      "env": {
+        "UNICHAT_MODEL": "YOUR_PREFERRED_MODEL_NAME",
+        "UNICHAT_API_KEY": "YOUR_VENDOR_API_KEY"
+      }
     }
-  }
+}
+```
+Run published:
+```json
+{
+  "mcpServers": {
+    "unichat-ts-mcp-server": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "unichat-ts-mcp-server"
+      ],
+      "env": {
+        "UNICHAT_MODEL": "YOUR_PREFERRED_MODEL_NAME",
+        "UNICHAT_API_KEY": "YOUR_VENDOR_API_KEY"
+      }
+    }
 }
 ```
 

@@ -1,14 +1,13 @@
-import { UnifiedChatApi, Message, MODELS_LIST } from "unichat-ts";
+#!/usr/bin/env node
+
+import { UnifiedChatApi, Message, MODELS_LIST, Role } from "unichat-ts";
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import {
   CallToolRequestSchema,
-  ListResourcesRequestSchema,
   ListToolsRequestSchema,
-  ReadResourceRequestSchema,
   ListPromptsRequestSchema,
   GetPromptRequestSchema,
-  PromptArgument,
 } from "@modelcontextprotocol/sdk/types.js";
 
 
@@ -52,8 +51,8 @@ function formatResponse(response: string) {
 }
 
 // Define prompts
-const PROMPTS = {
-  code_review:  {
+const PROMPTS = [
+  {
     name: "code_review",
     description: "Review code for best practices, potential issues, and improvements",
     arguments: [{
@@ -62,7 +61,7 @@ const PROMPTS = {
       required: true
     }]
   },
-  document_code: {
+  {
     name: "document_code",
     description: "Generate documentation for code including docstrings and comments",
     arguments: [{
@@ -71,7 +70,7 @@ const PROMPTS = {
       required: true
     }]
   },
-  explain_code: {
+  {
     name: "explain_code",
     description: "Explain how a piece of code works in detail",
     arguments: [{
@@ -79,11 +78,27 @@ const PROMPTS = {
       description: "The code to explain",
       required: true
     }]
+  },
+  {
+    name: "code_rework",
+    description: "Apply requested changes to the provided code",
+    arguments: [
+      {
+        name: "changes",
+        description: "The changes to apply",
+        required: false
+      },
+      {
+        name: "code",
+        description: "The code to rework",
+        required: true
+      }
+    ]
   }
-};
+];
 
 const PROMPT_TEMPLATES = {
-  code_review: `You are a senior software engineer conducting a thorough code review.
+  "code_review": `You are a senior software engineer conducting a thorough code review.
     Review the following code for:
     - Best practices
     - Potential bugs
@@ -93,7 +108,7 @@ const PROMPT_TEMPLATES = {
 
     Code to review:
     {code}`,
-  document_code: `You are a technical documentation expert.
+  "document_code": `You are a technical documentation expert.
     Generate comprehensive documentation for the following code.
     Include:
     - Overview
@@ -104,7 +119,7 @@ const PROMPT_TEMPLATES = {
 
     Code to document:
     {code}`,
-  explain_code: `You are a programming instructor explaining code to a beginner level programmer.
+  "explain_code": `You are a programming instructor explaining code to a beginner level programmer.
     Explain how the following code works:
 
     {code}
@@ -113,7 +128,18 @@ const PROMPT_TEMPLATES = {
     - Overall purpose
     - Key components
     - How it works step by step
-    - Any important concepts used`
+    - Any important concepts used`,
+  "code_rework": `You are a software architect specializing in code optimization and modernization.
+    With a foucs on:
+    - Modernizing syntax and approaches
+    - Improving structure and organization
+    - Enhancing maintainability
+    - Optimizing performance
+    - Applying current best practices
+    Do: {changes}
+
+    Code to transform:
+    {code}`
 };
 
 // Create server instance
@@ -218,29 +244,39 @@ server.setRequestHandler(ListPromptsRequestSchema, async () => {
 });
 
 server.setRequestHandler(GetPromptRequestSchema, async (request) => {
-  if (request.params.name in PROMPTS) {
-    const promptName = request.params.name.toString();
-    const code = request.params.arguments?.code;
+  const { name, arguments: args } = request.params;
 
-    if (!code) {
+  const promptNames: string[] = PROMPTS.map(prompt => prompt.name);
+
+  if (promptNames.includes(name)) {
+
+    if (!args) {
+      throw new Error("Missing arguments");
+    }
+
+    if (!args.code) {
       throw new Error("Missing required argument: code");
     }
 
-    const systemContent = PROMPT_TEMPLATES[promptName].replace("{code}", code);
+    const template = PROMPT_TEMPLATES[name as keyof typeof PROMPT_TEMPLATES];
+    const systemContent = template
+      .replace("{code}", args.code)
+      .replace("{changes}", args.changes || "");
 
     try {
-      // Here you would integrate with your actual chat API
-      // For now, we'll mock a response
-      const response = "This is a mock response from the chat API";
+      const client = new UnifiedChatApi(API_KEY);
+
+      const response = await client.chat.completions.create({
+        model: MODEL,
+        messages: [
+          {"role": Role.System, "content": systemContent},
+          {"role": Role.User, "content": "Please provide your analysis."}
+      ],
+        stream: false
+      });
 
       return {
-        description: `Requested code manipulation`,
-        messages: [
-          {
-            role: "user",
-            content: formatResponse(response)
-          }
-        ]
+        content: [formatResponse(response.toString())]
       };
     } catch (e) {
       throw new Error(`An error occurred: ${String(e)}`);
