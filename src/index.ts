@@ -271,12 +271,21 @@ server.setRequestHandler(GetPromptRequestSchema, async (request) => {
         messages: [
           {"role": Role.System, "content": systemContent},
           {"role": Role.User, "content": "Please provide your analysis."}
-      ],
+        ],
         stream: false
       });
 
       return {
-        content: [formatResponse(response.toString())]
+        description: "Requested code manipulation",
+        messages: [
+          {
+            role: "user",
+            content: {
+              type: "text",
+              text: formatResponse(response.toString())
+            }
+          }
+        ],
       };
     } catch (e) {
       throw new Error(`An error occurred: ${String(e)}`);
