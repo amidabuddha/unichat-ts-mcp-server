@@ -1,6 +1,6 @@
 # unichat-ts-mcp-server MCP Server
 
-Unichat MCP Server
+Unichat MCP Server in TypeScript. Also available in [Python](https://github.com/amidabuddha/unichat-mcp-server)
 
 ### Tools
 
