@@ -1,7 +1,9 @@
 # Unichat MCP Server in TypeScript
 Also available in [Python](https://github.com/amidabuddha/unichat-mcp-server)
 --
-Send requests to OpenAI, MistralAI, Anthropic, xAI, or Google AI using MCP protocol via tool or predefined prompts. Vendor API key required
+Send requests to OpenAI, MistralAI, Anthropic, xAI, or Google AI using MCP protocol via tool or predefined prompts. Vendor API key required.
+
+Both STDIO and SSE transport mechanisms supported via arguments.
 
 ### Tools
 
@@ -54,6 +56,8 @@ To use with Claude Desktop, add the server config:
 On MacOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
 On Windows: `%APPDATA%/Claude/claude_desktop_config.json`
 
+Runs in STDIO by default or with argument --stdio. To run in SSE add argument --sse
+
 Run locally:
 ```json
 {
@@ -86,6 +90,12 @@ Run published:
       }
     }
 }
+```
+
+
+Runs in STDIO by default or with argument --stdio. To run in SSE add argument --sse
+```bash
+npx -y unichat-ts-mcp-server --sse
 ```
 
 ### Debugging
