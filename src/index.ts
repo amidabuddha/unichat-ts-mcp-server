@@ -146,11 +146,10 @@ const PROMPT_TEMPLATES = {
 const server = new Server(
   {
     name: "unichat-ts-mcp-server",
-    version: "0.1.0",
+    version: "0.1.4",
   },
   {
     capabilities: {
-      resources: {},
       tools: {},
       prompts: {},
     },
@@ -163,17 +162,9 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
     tools: [
       {
         name: "unichat",
-        description: `Chat with the assistant. Messages must follow a specific structure:
-            - First message should be a system message defining the task or context
-            - Second message should be a user message containing the specific query or request
-
-            Example structure:
-            {
-                "messages": [
-                    {"role": "system", "content": "You are a helpful assistant focused on answering questions about Python programming"},
-                    {"role": "user", "content": "How do I use list comprehensions?"}
-                ]
-            }`,
+        description: `Chat with an assistant.
+                      Example tool use message:
+                      Ask the unichat to review and evaluate your proposal.`,
         inputSchema: {
           type: "object",
           properties: {
