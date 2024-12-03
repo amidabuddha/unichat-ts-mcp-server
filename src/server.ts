@@ -144,7 +144,7 @@ export const createServer = () => {
   const server = new Server(
     {
       name: "unichat-ts-mcp-server",
-      version: "0.1.5",
+      version: "0.1.6",
     },
     {
       capabilities: {
@@ -255,7 +255,7 @@ export const createServer = () => {
       try {
         const client = new UnifiedChatApi(API_KEY);
 
-        const response =  client.chat.completions.create({
+        const response = await client.chat.completions.create({
           model: MODEL,
           messages: [
             {"role": Role.System, "content": systemContent},
