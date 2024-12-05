@@ -144,10 +144,11 @@ export const createServer = () => {
   const server = new Server(
     {
       name: "unichat-ts-mcp-server",
-      version: "0.1.6",
+      version: "0.1.7",
     },
     {
       capabilities: {
+        logging: {},
         tools: {},
         prompts: {},
       },
@@ -196,11 +197,29 @@ export const createServer = () => {
   });
 
   server.setRequestHandler(CallToolRequestSchema, async (request) => {
+    await server.notification({
+      method: "notifications/message",
+      params: {
+        level: "info",
+        logger: "unichat-ts-mcp-server",
+        data: `Tool call to ${request.params.name} recieved`,
+      },
+    });
+
     switch (request.params.name) {
       case "unichat": {
         try {
           const messages = request.params.arguments?.messages as Message[];
           validateMessages(messages);
+
+          await server.notification({
+            method: "notifications/message",
+            params: {
+              level: "info",
+              logger: "unichat-ts-mcp-server",
+              data: `Parameters validated`,
+            },
+          });
 
           const client = new UnifiedChatApi(API_KEY);
 
@@ -210,6 +229,15 @@ export const createServer = () => {
             stream: false
           });
 
+          await server.notification({
+            method: "notifications/message",
+            params: {
+              level: "info",
+              logger: "unichat-ts-mcp-server",
+              data: `Response from ${MODEL} received`,
+            },
+          });
+          
           return {
             content: [formatResponse(response.toString())]
           };
@@ -234,6 +262,14 @@ export const createServer = () => {
 
   server.setRequestHandler(GetPromptRequestSchema, async (request) => {
     const { name, arguments: args } = request.params;
+    await server.notification({
+      method: "notifications/message",
+      params: {
+        level: "info",
+        logger: "unichat-ts-mcp-server",
+        data: `Prompt ${name} request recieved`,
+      },
+    });
 
     const promptNames: string[] = PROMPTS.map(prompt => prompt.name);
 
@@ -252,6 +288,15 @@ export const createServer = () => {
         .replace("{code}", args.code)
         .replace("{changes}", args.changes || "");
 
+      await server.notification({
+        method: "notifications/message",
+        params: {
+          level: "info",
+          logger: "unichat-ts-mcp-server",
+          data: `Parameters validated`,
+        },
+      });
+
       try {
         const client = new UnifiedChatApi(API_KEY);
 
@@ -262,6 +307,15 @@ export const createServer = () => {
             {"role": Role.User, "content": "Please provide your analysis."}
           ],
           stream: false
+        });
+
+        await server.notification({
+          method: "notifications/message",
+          params: {
+            level: "info",
+            logger: "unichat-ts-mcp-server",
+            data: `Response from ${MODEL} received`,
+          },
         });
 
         return {
