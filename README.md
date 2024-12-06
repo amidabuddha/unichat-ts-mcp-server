@@ -105,6 +105,7 @@ Since MCP servers communicate over stdio, debugging can be challenging. We recom
 ```bash
 npm run inspector
 ```
-If you experience timeouts during testing change the request URL on the inspector interface to: http://localhost:3001/sse?timeout=600000
 
 The Inspector will provide a URL to access debugging tools in your browser.
+
+If you experience timeouts during testing in SSE mode change the request URL on the inspector interface to: http://localhost:3001/sse?timeout=600000
