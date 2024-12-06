@@ -12,49 +12,39 @@ import {
 // Environment validation
 const MODEL = process.env.UNICHAT_MODEL;
 if (!MODEL) {
-  console.error("UNICHAT_MODEL environment variable not found");
   throw new Error("UNICHAT_MODEL environment variable required");
 }
 if (!Object.values(MODELS_LIST).flat().includes(MODEL)) {
-  console.error(`Invalid model specified: ${MODEL}`);
   throw new Error(`Unsupported model: ${MODEL}`);
 }
 
 const API_KEY = process.env.UNICHAT_API_KEY;
 if (!API_KEY) {
-  console.error("UNICHAT_API_KEY environment variable not found");
   throw new Error("UNICHAT_API_KEY environment variable required");
 }
 
 
 // Validation functions
 function validateMessages(messages: Message[]): void {
-  console.debug(`Validating messages: ${messages.length} messages received`);
   if (messages.length !== 2) {
-    console.error(`Invalid number of messages: ${messages.length}`);
     throw new Error("Exactly two messages are required: one system message and one user message");
   }
 
   if (messages[0].role !== "system") {
-    console.error("First message has incorrect role");
     throw new Error("First message must have role 'system'");
   }
 
   if (messages[1].role !== "user") {
-    console.error("Second message has incorrect role");
     throw new Error("Second message must have role 'user'");
   }
 }
 
 // Format response helper
 function formatResponse(response: string) {
-  console.debug("Formatting response");
   try {
     const formatted = { type: "text", text: response.trim() };
-    console.debug("Response formatted successfully");
     return formatted;
   } catch (e) {
-    console.error(`Error formatting response: ${String(e)}`);
     return { type: "text", text: `Error formatting response: ${String(e)}` };
   }
 }
@@ -156,7 +146,7 @@ export const createServer = () => {
   const server = new Server(
     {
       name: "unichat-ts-mcp-server",
-      version: "0.1.11",
+      version: "0.1.12",
     },
     {
       capabilities: {
@@ -227,7 +217,6 @@ export const createServer = () => {
     switch (request.params.name) {
       case "unichat": {
         try {
-          console.debug("Validating messages");
           const messages = request.params.arguments?.messages as Message[];
           validateMessages(messages);
 
@@ -244,13 +233,11 @@ export const createServer = () => {
             content: [formatted_response]
           };
         } catch (e) {
-          console.error(`Error calling tool: ${String(e)}`);
           throw new Error(`An error occurred: ${String(e)}`);
         }
       }
 
       default:
-        console.error(`Unknown tool requested: ${request.params.name}`);
         throw new Error(`Unknown tool: ${request.params.name}`);
     }
   });
@@ -271,16 +258,13 @@ export const createServer = () => {
 
     if (promptNames.includes(name)) {
       if (!args) {
-        console.error("Missing arguments");
         throw new Error("Missing arguments");
       }
 
       if (!args.code) {
-        console.error("Missing required code argument");
         throw new Error("Missing required argument: code");
       }
 
-      console.debug("Formatting prompt template");
       const template = PROMPT_TEMPLATES[name as keyof typeof PROMPT_TEMPLATES];
       const systemContent = template
         .replace("{code}", args.code)
@@ -309,12 +293,10 @@ export const createServer = () => {
           ],
         };
       } catch (e) {
-        console.error(`Error getting prompt completion: ${String(e)}`);
         throw new Error(`An error occurred: ${String(e)}`);
       }
     }
 
-    console.error(`Prompt not found: ${name}`);
     throw new Error("Unknown prompt");
   });
 
