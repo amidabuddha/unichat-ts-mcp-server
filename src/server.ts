@@ -12,15 +12,18 @@ import {
 // Environment validation
 const MODEL = process.env.UNICHAT_MODEL;
 if (!MODEL) {
-  throw new Error("UNICHAT_MODEL environment variable required");
+  console.error("UNICHAT_MODEL environment variable required");
+  process.exit(1);
 }
 if (!Object.values(MODELS_LIST).flat().includes(MODEL)) {
-  throw new Error(`Unsupported model: ${MODEL}`);
+  console.error(`Unsupported model: ${MODEL}`);
+  process.exit(1);
 }
 
 const API_KEY = process.env.UNICHAT_API_KEY;
 if (!API_KEY) {
-  throw new Error("UNICHAT_API_KEY environment variable required");
+  console.error("UNICHAT_API_KEY environment variable required");
+  process.exit(1);
 }
 
 
@@ -146,7 +149,7 @@ export const createServer = () => {
   const server = new Server(
     {
       name: "unichat-ts-mcp-server",
-      version: "0.1.12",
+      version: "0.2.0",
     },
     {
       capabilities: {
