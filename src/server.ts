@@ -156,7 +156,7 @@ export const createServer = () => {
   const server = new Server(
     {
       name: "unichat-ts-mcp-server",
-      version: "0.1.10",
+      version: "0.1.11",
     },
     {
       capabilities: {
@@ -239,8 +239,9 @@ export const createServer = () => {
             stream: false
           });
 
+          const formatted_response = formatResponse(response.toString());
           return {
-            content: [formatResponse(response.toString())]
+            content: [formatted_response]
           };
         } catch (e) {
           console.error(`Error calling tool: ${String(e)}`);
@@ -297,12 +298,13 @@ export const createServer = () => {
           stream: false
         });
 
+        const formatted_response = formatResponse(response.toString());
         return {
           description: "Requested code manipulation",
           messages: [
             {
               role: "user",
-              content: formatResponse(response.toString())
+              content: formatted_response
             }
           ],
         };
