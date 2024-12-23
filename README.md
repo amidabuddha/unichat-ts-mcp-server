@@ -1,4 +1,5 @@
 # Unichat MCP Server in TypeScript
+[![smithery badge](https://smithery.ai/badge/unichat-ts-mcp-server)](https://smithery.ai/server/unichat-ts-mcp-server)
 Also available in [Python](https://github.com/amidabuddha/unichat-mcp-server)
 --
 Send requests to OpenAI, MistralAI, Anthropic, xAI, or Google AI using MCP protocol via tool or predefined prompts. Vendor API key required.
@@ -50,6 +51,16 @@ npm run watch
 ```
 
 ## Installation
+
+### Installing via Smithery
+
+To install Unichat MCP Server for Claude Desktop automatically via [Smithery](https://smithery.ai/server/unichat-ts-mcp-server):
+
+```bash
+npx -y @smithery/cli install unichat-ts-mcp-server --client claude
+```
+
+### Installing manually
 
 To use with Claude Desktop, add the server config:
 
