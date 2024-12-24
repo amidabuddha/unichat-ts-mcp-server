@@ -6,6 +6,8 @@ Send requests to OpenAI, MistralAI, Anthropic, xAI, or Google AI using MCP proto
 
 Both STDIO and SSE transport mechanisms supported via arguments.
 
+<a href="https://glama.ai/mcp/servers/ub2u8wtbbv"><img width="380" height="200" src="https://glama.ai/mcp/servers/ub2u8wtbbv/badge" alt="unichat-ts-mcp-server MCP server" /></a>
+
 ### Tools
 
 The server implements one tool:
