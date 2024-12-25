@@ -75,18 +75,6 @@ To use with Claude Desktop, add the server config:
 On MacOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
 On Windows: `%APPDATA%/Claude/claude_desktop_config.json`
 
-> Runs in STDIO by default or with argument `--stdio`. To run in SSE add argument `--sse`
-
-**Supported Models:**
-> A list of currently supported models to be used as `"YOUR_PREFERRED_MODEL_NAME"` may be found [here](https://github.com/amidabuddha/unichat-ts/blob/main/src/models.ts). Please make sure to add the relevant vendor API key as `"YOUR_VENDOR_API_KEY"`
-
-**Example:**
-```json
-"env": {
-  "UNICHAT_MODEL": "gpt-4o-mini",
-  "UNICHAT_API_KEY": "YOUR_OPENAI_API_KEY"
-}
-```
 Run locally:
 ```json
 {
@@ -122,11 +110,20 @@ Run published:
 ```
 
 
-Runs in STDIO by default or with argument --stdio. To run in SSE add argument --sse
+> Runs in STDIO by default or with argument `--stdio`. To run in SSE add argument `--sse`
 ```bash
 npx -y unichat-ts-mcp-server --sse
 ```
+**Supported Models:**
+> A list of currently supported models to be used as `"YOUR_PREFERRED_MODEL_NAME"` may be found [here](https://github.com/amidabuddha/unichat-ts/blob/main/src/models.ts). Please make sure to add the relevant vendor API key as `"YOUR_VENDOR_API_KEY"`
 
+**Example:**
+```json
+"env": {
+  "UNICHAT_MODEL": "gpt-4o-mini",
+  "UNICHAT_API_KEY": "YOUR_OPENAI_API_KEY"
+}
+```
 ### Debugging
 
 Since MCP servers communicate over stdio, debugging can be challenging. We recommend using the [MCP Inspector](https://github.com/modelcontextprotocol/inspector), which is available as a package script:
