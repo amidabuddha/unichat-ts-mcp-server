@@ -78,7 +78,7 @@ On Windows: `%APPDATA%/Claude/claude_desktop_config.json`
 > Runs in STDIO by default or with argument `--stdio`. To run in SSE add argument `--sse`
 
 **Supported Models:**
-> A list of currently supported models to be used as `"SELECTED_UNICHAT_MODEL"` may be found [here](https://github.com/amidabuddha/unichat/blob/main/unichat/models.py). Please make sure to add the relevant vendor API key as `"YOUR_UNICHAT_API_KEY"`
+> A list of currently supported models to be used as `"YOUR_PREFERRED_MODEL_NAME"` may be found [here](https://github.com/amidabuddha/unichat-ts/blob/main/src/models.ts). Please make sure to add the relevant vendor API key as `"YOUR_VENDOR_API_KEY"`
 
 **Example:**
 ```json
