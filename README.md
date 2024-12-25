@@ -1,12 +1,18 @@
 # Unichat MCP Server in TypeScript
-[![smithery badge](https://smithery.ai/badge/unichat-ts-mcp-server)](https://smithery.ai/server/unichat-ts-mcp-server)
 Also available in [Python](https://github.com/amidabuddha/unichat-mcp-server)
 --
+ <h4 align="center">
+  <a href="https://glama.ai/mcp/servers/ub2u8wtbbv"><img width="380" height="200" src="https://glama.ai/mcp/servers/ub2u8wtbbv/badge" alt="unichat-ts-mcp-server MCP server" /></a>
+  <a href="https://smithery.ai/server/unichat-ts-mcp-server"><br>
+  <img src="https://smithery.ai/badge/unichat-ts-mcp-server" alt="Smithery Server Installations" />
+  </a>
+</h4>
+
 Send requests to OpenAI, MistralAI, Anthropic, xAI, or Google AI using MCP protocol via tool or predefined prompts. Vendor API key required.
 
 Both STDIO and SSE transport mechanisms supported via arguments.
 
-<a href="https://glama.ai/mcp/servers/ub2u8wtbbv"><img width="380" height="200" src="https://glama.ai/mcp/servers/ub2u8wtbbv/badge" alt="unichat-ts-mcp-server MCP server" /></a>
+
 
 ### Tools
 
@@ -69,8 +75,18 @@ To use with Claude Desktop, add the server config:
 On MacOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
 On Windows: `%APPDATA%/Claude/claude_desktop_config.json`
 
-Runs in STDIO by default or with argument --stdio. To run in SSE add argument --sse
+> Runs in STDIO by default or with argument `--stdio`. To run in SSE add argument `--sse`
 
+**Supported Models:**
+> A list of currently supported models to be used as `"SELECTED_UNICHAT_MODEL"` may be found [here](https://github.com/amidabuddha/unichat/blob/main/unichat/models.py). Please make sure to add the relevant vendor API key as `"YOUR_UNICHAT_API_KEY"`
+
+**Example:**
+```json
+"env": {
+  "UNICHAT_MODEL": "gpt-4o-mini",
+  "UNICHAT_API_KEY": "YOUR_OPENAI_API_KEY"
+}
+```
 Run locally:
 ```json
 {
