@@ -149,7 +149,7 @@ export const createServer = () => {
   const server = new Server(
     {
       name: "unichat-ts-mcp-server",
-      version: "0.2.0",
+      version: "0.2.1",
     },
     {
       capabilities: {
@@ -223,7 +223,7 @@ export const createServer = () => {
           const messages = request.params.arguments?.messages as Message[];
           validateMessages(messages);
 
-          const client = new UnifiedChatApi(API_KEY);
+          const client = new UnifiedChatApi({apiKey: API_KEY});
 
           const response = await client.chat.completions.create({
             model: MODEL,
@@ -231,9 +231,9 @@ export const createServer = () => {
             stream: false
           });
 
-          const formatted_response = formatResponse(response.toString());
+          const formatted_response = formatResponse(response.choices[0].message.content.toString());
           return {
-            content: [formatted_response]
+            content: [formatted_response],
           };
         } catch (e) {
           throw new Error(`An error occurred: ${String(e)}`);
@@ -274,7 +274,7 @@ export const createServer = () => {
         .replace("{changes}", args.changes || "");
 
       try {
-        const client = new UnifiedChatApi(API_KEY);
+        const client = new UnifiedChatApi({apiKey: API_KEY});
 
         const response = await client.chat.completions.create({
           model: MODEL,
@@ -285,7 +285,7 @@ export const createServer = () => {
           stream: false
         });
 
-        const formatted_response = formatResponse(response.toString());
+        const formatted_response = formatResponse(response.choices[0].message.content.toString());
         return {
           description: "Requested code manipulation",
           messages: [
