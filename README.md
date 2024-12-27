@@ -8,7 +8,7 @@ Also available in [Python](https://github.com/amidabuddha/unichat-mcp-server)
   </a>
 </h4>
 
-Send requests to OpenAI, MistralAI, Anthropic, xAI, or Google AI using MCP protocol via tool or predefined prompts. Vendor API key required.
+Send requests to OpenAI, MistralAI, Anthropic, xAI, Google AI or DeepSeek using MCP protocol via tool or predefined prompts. Vendor API key required.
 
 Both STDIO and SSE transport mechanisms supported via arguments.
 
