@@ -1,0 +1,21 @@
+# Smithery configuration file: https://smithery.ai/docs/config#smitheryyaml
+
+startCommand:
+  type: stdio
+  configSchema:
+    # JSON Schema defining the configuration options for the MCP.
+    type: object
+    required:
+      - unichatModel
+      - unichatApiKey
+    properties:
+      unichatModel:
+        type: string
+        description: The preferred model name to use with the Unichat MCP Server.
+      unichatApiKey:
+        type: string
+        description: The API key for the vendor to use with Unichat MCP Server.
+  commandFunction:
+    # A function that produces the CLI command to start the MCP on stdio.
+    |-
+    config => ({ command: 'node', args: ['build/index.js'], env: { UNICHAT_MODEL: config.unichatModel, UNICHAT_API_KEY: config.unichatApiKey } })
