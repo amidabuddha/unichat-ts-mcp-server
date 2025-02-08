@@ -1,6 +1,6 @@
 {
   "name": "unichat-ts-mcp-server",
-  "version": "0.2.4",
+  "version": "0.2.6",
   "author": "Stefan",
   "license": "MIT",
   "description": "Unichat MCP Server",
@@ -21,7 +21,7 @@
     "@modelcontextprotocol/sdk": "0.6.0",
     "commander": "^12.1.0",
     "express": "^4.21.1",
-    "unichat-ts": "2.3.0"
+    "unichat-ts": "^2.3.4"
   },
   "devDependencies": {
     "@types/express": "^5.0.0",
