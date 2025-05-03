@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/amidabuddha-unichat-ts-mcp-server-badge.png)](https://mseep.ai/app/amidabuddha-unichat-ts-mcp-server)
+
 # Unichat MCP Server in TypeScript
 Also available in [Python](https://github.com/amidabuddha/unichat-mcp-server)
 --
