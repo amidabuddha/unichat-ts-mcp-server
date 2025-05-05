@@ -27,7 +27,7 @@
   "devDependencies": {
     "@types/express": "^5.0.0",
     "@types/node": "^20.11.24",
-    "typescript": "^5.3.3"
+    "typescript": "^5.8.3"
   },
   "homepage": "https://github.com/amidabuddha/unichat-ts-mcp-server#readme",
   "repository": {
