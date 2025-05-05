@@ -1,10 +1,11 @@
-[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/amidabuddha-unichat-ts-mcp-server-badge.png)](https://mseep.ai/app/amidabuddha-unichat-ts-mcp-server)
+
 
 # Unichat MCP Server in TypeScript
 Also available in [Python](https://github.com/amidabuddha/unichat-mcp-server)
 --
  <h4 align="center">
   <a href="https://glama.ai/mcp/servers/ub2u8wtbbv"><img width="380" height="200" src="https://glama.ai/mcp/servers/ub2u8wtbbv/badge" alt="unichat-ts-mcp-server MCP server" /></a>
+  <a href="https://mseep.ai/app/amidabuddha-unichat-ts-mcp-server"><img width="380" height="200" src="https://mseep.net/pr/amidabuddha-unichat-ts-mcp-server-badge.png" alt="MseeP.ai Security Assessment Badge" /></a>
   <a href="https://smithery.ai/server/unichat-ts-mcp-server"><br>
   <img src="https://smithery.ai/badge/unichat-ts-mcp-server" alt="Smithery Server Installations" />
   </a>
