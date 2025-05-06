@@ -1,12 +1,12 @@
 {
   "name": "unichat-ts-mcp-server",
-  "version": "0.2.7",
+  "version": "0.2.8",
   "author": "Stefan",
   "license": "MIT",
   "description": "Unichat MCP Server",
   "type": "module",
   "bin": {
-    "unichat-ts-mcp-server": "./build/index.js"
+    "unichat-ts-mcp-server": "build/index.js"
   },
   "files": [
     "build"
