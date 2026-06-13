@@ -26,7 +26,6 @@ if (!API_KEY) {
   process.exit(1);
 }
 
-
 // Validation functions
 function validateMessages(messages: Message[]): void {
   if (messages.length !== 2) {
@@ -149,7 +148,7 @@ export const createServer = () => {
   const server = new Server(
     {
       name: "unichat-ts-mcp-server",
-      version: "0.2.7",
+      version: "0.2.10",
     },
     {
       capabilities: {

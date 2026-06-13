@@ -1,6 +1,6 @@
 {
   "name": "unichat-ts-mcp-server",
-  "version": "0.2.9",
+  "version": "0.2.10",
   "author": "Stefan",
   "license": "MIT",
   "description": "Unichat MCP Server",
@@ -12,17 +12,16 @@
     "build"
   ],
   "scripts": {
-    "build": "tsc && node -e \"require('fs').chmodSync('build/index.js', '755')\"",
+    "build": "node -e \"require('fs').rmSync('build', { recursive: true, force: true })\" && tsc && node -e \"require('fs').chmodSync('build/index.js', '755')\"",
     "prepare": "npm run build",
     "watch": "tsc --watch",
     "inspector": "npx @modelcontextprotocol/inspector build/index.js"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "0.6.0",
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "commander": "^12.1.0",
-    "express": "^4.21.1",
-    "mcp-evals": "^1.0.18",
-    "unichat-ts": "^2.3.50"
+    "express": "^5.2.1",
+    "unichat-ts": "^2.4.0"
   },
   "devDependencies": {
     "@types/express": "^5.0.0",

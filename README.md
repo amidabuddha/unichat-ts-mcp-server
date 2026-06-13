@@ -61,15 +61,6 @@ For development with auto-rebuild:
 npm run watch
 ```
 
-
-
-## Running evals
-
-The evals package loads an mcp client that then runs the index.ts file, so there is no need to rebuild between tests. You can load environment variables by prefixing the npx command. Full documentation can be found [here](https://www.mcpevals.io/docs).
-
-```bash
-OPENAI_API_KEY=your-key  npx mcp-eval src/evals/evals.ts src/server.ts
-```
 ## Installation
 
 ### Installing via Smithery
@@ -126,13 +117,16 @@ Run published:
 ```bash
 npx -y unichat-ts-mcp-server --sse
 ```
+
+SSE transport validates the `Host` header against `localhost`, `127.0.0.1`, and `[::1]` by default. For remote SSE deployments, set `MCP_ALLOWED_HOSTS` to a comma-separated list of allowed hostnames.
+
 **Supported Models:**
 > A list of currently supported models to be used as `"YOUR_PREFERRED_MODEL_NAME"` may be found [here](https://github.com/amidabuddha/unichat-ts/blob/main/src/models.ts). Please make sure to add the relevant vendor API key as `"YOUR_VENDOR_API_KEY"`
 
 **Example:**
 ```json
 "env": {
-  "UNICHAT_MODEL": "gpt-4o-mini",
+  "UNICHAT_MODEL": "gpt-5.4-mini",
   "UNICHAT_API_KEY": "YOUR_OPENAI_API_KEY"
 }
 ```
