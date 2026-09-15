@@ -46,20 +46,71 @@ The server implements one tool:
 
 ## Development
 
-Install dependencies:
+### Clean installation from source
+
+Prerequisites: Git, Node.js and npm. Use Node.js 24 to match the repository's publishing workflow; `package.json` does not declare a supported Node.js version range. Include development dependencies when installing, since the build requires TypeScript.
+
+Clone the repository and restore dependencies from the committed `package-lock.json`:
+
 ```bash
-npm install
+git clone https://github.com/amidabuddha/unichat-ts-mcp-server.git
+cd unichat-ts-mcp-server
+npm ci
 ```
 
-Build the server:
+`npm ci` automatically runs `prepare`, which invokes `npm run build`. That script removes the generated `build/` directory, compiles `src/` into `build/` using `tsconfig.json`, and marks `build/index.js` executable. With lifecycle scripts enabled (the default), no separate first build is needed. Keep `package-lock.json` and install development dependencies; do not use `--ignore-scripts` or `--omit=dev` for this workflow.
+
+Before running, set `UNICHAT_MODEL` and `UNICHAT_API_KEY` in the process environment, or use the MCP client's `env` configuration shown under [Installing manually](#installing-manually). Replace both placeholders with a supported model and its vendor API key. For example, in a POSIX shell:
+
+```bash
+export UNICHAT_MODEL="YOUR_PREFERRED_MODEL_NAME"
+export UNICHAT_API_KEY="YOUR_VENDOR_API_KEY"
+node build/index.js --stdio
+```
+
+The server reads the process environment; it does not automatically load `.env` files. STDIO expects an MCP client to communicate with the process. To run the local build over SSE instead, use `node build/index.js --sse` (default endpoint: `http://localhost:3001/sse`). See the SSE host configuration below for remote access.
+
+### Normal development
+
+Run all commands from the repository root. For automatic recompilation as source files change:
+
+```bash
+npm run watch
+```
+
+This runs `tsc --watch`, which recompiles affected files during the watch session. It does not start or restart the server. After compilation, restart the server or reconnect the MCP client so it launches the updated build, using the environment setup above.
+
+For a one-off build:
+
 ```bash
 npm run build
 ```
 
-For development with auto-rebuild:
+This script always recreates `build/`; use watch mode for incremental recompilation during editing. Ordinary source changes do not require deleting dependencies or reinstalling everything. If dependency manifests and the lockfile change after pulling updates, run `npm ci` again.
+
+There is no automated test script in `package.json`. The build performs TypeScript checking; for manual MCP checks after building, run `npm run inspector` with the required environment variables set, as described under [Debugging](#debugging).
+
+### Clean rebuild of an existing checkout
+
+Stop any running watcher and server first. From the repository root, restore locked dependencies and rebuild from scratch:
+
 ```bash
-npm run watch
+npm ci
 ```
+
+`npm ci` replaces `node_modules/` itself, then `prepare` runs the build script, which deletes and regenerates only `build/`. This also works when either or both directories have already been removed. No separate deletion or second build command is needed.
+
+If dependencies are already installed and match the lockfile, and only generated output needs a clean rebuild, run:
+
+```bash
+npm run build
+```
+
+These workflows preserve `src/`, configuration, `.env` files, user data outside the generated directories, and `package-lock.json`. Keep only generated files in `build/`. Do not use `git clean` or clear global npm caches or toolchains for a project rebuild.
+
+### Publishing
+
+Publishing is a separate release action. The repository's [publishing workflow](.github/workflows/publish.yml) uses `npm publish` after installation and building. Local installation, development and clean rebuilds do not require publishing.
 
 ## Installation
 
