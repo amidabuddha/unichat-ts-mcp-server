@@ -148,7 +148,7 @@ export const createServer = () => {
   const server = new Server(
     {
       name: "unichat-ts-mcp-server",
-      version: "0.2.16",
+      version: "0.2.18",
     },
     {
       capabilities: {
