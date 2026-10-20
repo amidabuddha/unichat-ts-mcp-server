@@ -1,6 +1,6 @@
 {
   "name": "unichat-ts-mcp-server",
-  "version": "0.2.18",
+  "version": "0.2.19",
   "author": "Stefan",
   "license": "MIT",
   "description": "Unichat MCP Server",
@@ -18,7 +18,7 @@
     "inspector": "npx @modelcontextprotocol/inspector build/index.js"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.29.0",
+    "@modelcontextprotocol/sdk": "^1.31.0",
     "commander": "^12.1.0",
     "express": "^5.2.1",
     "unichat-ts": "^2.4.3"
